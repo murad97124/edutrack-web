@@ -1,0 +1,2175 @@
+{
+	"info": {
+		"_postman_id": "edutrack360-api-collection",
+		"name": "EduTrack360 API Collection",
+		"description": "Complete API collection for EduTrack360 School Management System",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "edutrack360"
+	},
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{access_token}}",
+				"type": "string"
+			}
+		]
+	},
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8087",
+			"type": "string"
+		},
+		{
+			"key": "access_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "refresh_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "school_subdomain",
+			"value": "demo-school",
+			"type": "string"
+		},
+		{
+			"key": "demo_request_id",
+			"value": "",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    if (jsonData.data && jsonData.data.accessToken) {",
+									"        pm.collectionVariables.set('access_token', jsonData.data.accessToken);",
+									"        pm.collectionVariables.set('refresh_token', jsonData.data.refreshToken);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"usernameOrEmail\": \"admin@edutrack.com\",\n    \"password\": \"Admin@123\",\n    \"schoolSubdomain\": \"{{school_subdomain}}\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						},
+						"description": "Authenticate user and return JWT tokens"
+					},
+					"response": []
+				},
+				{
+					"name": "Register",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"newuser\",\n    \"email\": \"newuser@example.com\",\n    \"password\": \"Password@123\",\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"phoneNumber\": \"+1234567890\",\n    \"role\": \"PARENT\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/register",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"register"
+							]
+						},
+						"description": "Register a new user account"
+					},
+					"response": []
+				},
+				{
+					"name": "Refresh Token",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"refreshToken\": \"{{refresh_token}}\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/refresh",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"refresh"
+							]
+						},
+						"description": "Refresh access token using refresh token"
+					},
+					"response": []
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/auth/logout?refreshToken={{refresh_token}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"logout"
+							],
+							"query": [
+								{
+									"key": "refreshToken",
+									"value": "{{refresh_token}}"
+								}
+							]
+						},
+						"description": "Invalidate user session"
+					},
+					"response": []
+				},
+				{
+					"name": "Change Password",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"currentPassword\": \"OldPassword@123\",\n    \"newPassword\": \"NewPassword@123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/change-password",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"change-password"
+							]
+						},
+						"description": "Change user password"
+					},
+					"response": []
+				}
+			],
+			"description": "Authentication endpoints for login, registration, and token management"
+		},
+		{
+			"name": "Users",
+			"item": [
+				{
+					"name": "Get Current User",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/users/me",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"me"
+							]
+						},
+						"description": "Get the currently authenticated user's profile"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Current User",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"phoneNumber\": \"+1234567890\",\n    \"address\": \"123 Main St, City, State\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/users/me",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"me"
+							]
+						},
+						"description": "Update the current user's profile"
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Users",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/users?page=0&size=20&role=TEACHER&status=ACTIVE&search=",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "20"
+								},
+								{
+									"key": "role",
+									"value": "TEACHER",
+									"description": "SYSTEM_ADMIN, PRINCIPAL, ASSISTANT_PRINCIPAL, TEACHER, PARENT"
+								},
+								{
+									"key": "status",
+									"value": "ACTIVE",
+									"description": "ACTIVE, INACTIVE, SUSPENDED"
+								},
+								{
+									"key": "search",
+									"value": ""
+								}
+							]
+						},
+						"description": "Get paginated list of users in the school (Principal/Assistant Principal only)"
+					},
+					"response": []
+				},
+				{
+					"name": "Create User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"teacher1\",\n    \"email\": \"teacher1@school.com\",\n    \"password\": \"Teacher@123\",\n    \"firstName\": \"Jane\",\n    \"lastName\": \"Smith\",\n    \"phoneNumber\": \"+1234567891\",\n    \"role\": \"TEACHER\",\n    \"address\": \"456 Oak St, City, State\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/users",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users"
+							]
+						},
+						"description": "Create a new user in the school (Principal/Assistant Principal only)"
+					},
+					"response": []
+				},
+				{
+					"name": "Get User by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/users/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"1"
+							]
+						},
+						"description": "Get user details by ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Update User",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"firstName\": \"Jane\",\n    \"lastName\": \"Smith\",\n    \"phoneNumber\": \"+1234567891\",\n    \"address\": \"456 Oak St, City, State\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/users/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"1"
+							]
+						},
+						"description": "Update user information"
+					},
+					"response": []
+				},
+				{
+					"name": "Update User Status",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/users/1/status?status=ACTIVE",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"1",
+								"status"
+							],
+							"query": [
+								{
+									"key": "status",
+									"value": "ACTIVE",
+									"description": "ACTIVE, INACTIVE, SUSPENDED"
+								}
+							]
+						},
+						"description": "Update user status"
+					},
+					"response": []
+				}
+			],
+			"description": "User management endpoints"
+		},
+		{
+			"name": "Students",
+			"item": [
+				{
+					"name": "Create Student",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"firstName\": \"Emma\",\n    \"lastName\": \"Johnson\",\n    \"dateOfBirth\": \"2015-05-15\",\n    \"gender\": \"FEMALE\",\n    \"gradeLevel\": \"3\",\n    \"className\": \"3A\",\n    \"enrollmentDate\": \"2024-09-01\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/students",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"students"
+							]
+						},
+						"description": "Create a new student"
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Students",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/students?page=0&size=20&status=ACTIVE&gradeLevel=3&className=3A&search=",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"students"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "20"
+								},
+								{
+									"key": "status",
+									"value": "ACTIVE",
+									"description": "ACTIVE, INACTIVE, TRANSFERRED, GRADUATED"
+								},
+								{
+									"key": "gradeLevel",
+									"value": "3"
+								},
+								{
+									"key": "className",
+									"value": "3A"
+								},
+								{
+									"key": "search",
+									"value": ""
+								}
+							]
+						},
+						"description": "Get paginated list of students"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Student by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/students/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"students",
+								"1"
+							]
+						},
+						"description": "Get student details by ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Student",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"firstName\": \"Emma\",\n    \"lastName\": \"Johnson\",\n    \"gradeLevel\": \"4\",\n    \"className\": \"4A\",\n    \"status\": \"ACTIVE\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/students/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"students",
+								"1"
+							]
+						},
+						"description": "Update student information"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Student Parents",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/students/1/parents",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"students",
+								"1",
+								"parents"
+							]
+						},
+						"description": "Get parents/guardians of a student"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Parent-Student Relationship",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"studentId\": 1,\n    \"parentUserId\": 5,\n    \"relationship\": \"FATHER\",\n    \"isPrimaryContact\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/students/relationships",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"students",
+								"relationships"
+							]
+						},
+						"description": "Link a parent to a student"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Parent-Student Relationship",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/students/relationships/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"students",
+								"relationships",
+								"1"
+							]
+						},
+						"description": "Remove parent-student relationship"
+					},
+					"response": []
+				}
+			],
+			"description": "Student management endpoints"
+		},
+		{
+			"name": "Buses",
+			"item": [
+				{
+					"name": "Create Bus",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"busNumber\": \"BUS-001\",\n    \"licensePlate\": \"ABC1234\",\n    \"capacity\": 40,\n    \"driverName\": \"Mike Wilson\",\n    \"driverPhone\": \"+1234567892\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/buses",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"buses"
+							]
+						},
+						"description": "Create a new bus"
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Buses",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/buses?page=0&size=20",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"buses"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "20"
+								}
+							]
+						},
+						"description": "Get paginated list of buses"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Bus by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/buses/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"buses",
+								"1"
+							]
+						},
+						"description": "Get bus details by ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Bus",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"busNumber\": \"BUS-001\",\n    \"licensePlate\": \"ABC1234\",\n    \"capacity\": 45,\n    \"driverName\": \"Mike Wilson\",\n    \"driverPhone\": \"+1234567892\",\n    \"status\": \"ACTIVE\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/buses/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"buses",
+								"1"
+							]
+						},
+						"description": "Update bus information"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Current Bus Location",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/buses/1/location",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"buses",
+								"1",
+								"location"
+							]
+						},
+						"description": "Get the latest location of a bus"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Bus Location",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"latitude\": 40.7128,\n    \"longitude\": -74.0060,\n    \"speed\": 35.5,\n    \"heading\": 90.0\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/buses/1/location",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"buses",
+								"1",
+								"location"
+							]
+						},
+						"description": "Update bus location (for driver app)"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Bus Routes",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/buses/1/route",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"buses",
+								"1",
+								"route"
+							]
+						},
+						"description": "Get all routes for a bus"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Bus Route",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"busId\": 1,\n    \"routeName\": \"Morning Route A\",\n    \"routeType\": \"PICKUP\",\n    \"startTime\": \"07:00:00\",\n    \"endTime\": \"08:30:00\",\n    \"stops\": [\n        {\n            \"stopName\": \"Main Street\",\n            \"latitude\": 40.7128,\n            \"longitude\": -74.0060,\n            \"stopOrder\": 1,\n            \"arrivalTime\": \"07:15:00\"\n        },\n        {\n            \"stopName\": \"Park Avenue\",\n            \"latitude\": 40.7580,\n            \"longitude\": -73.9855,\n            \"stopOrder\": 2,\n            \"arrivalTime\": \"07:30:00\"\n        }\n    ]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/buses/routes",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"buses",
+								"routes"
+							]
+						},
+						"description": "Create a new route for a bus"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Bus Assignments",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/buses/1/assignments",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"buses",
+								"1",
+								"assignments"
+							]
+						},
+						"description": "Get all student assignments for a bus"
+					},
+					"response": []
+				},
+				{
+					"name": "Assign Student to Bus",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"studentId\": 1,\n    \"busId\": 1,\n    \"pickupStopId\": 1,\n    \"dropoffStopId\": 2,\n    \"effectiveFrom\": \"2024-09-01\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/buses/assignments",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"buses",
+								"assignments"
+							]
+						},
+						"description": "Assign a student to a bus with pickup/dropoff stops"
+					},
+					"response": []
+				}
+			],
+			"description": "Bus management and tracking endpoints"
+		},
+		{
+			"name": "Parent",
+			"item": [
+				{
+					"name": "Get My Children",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/parent/students",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"parent",
+								"students"
+							]
+						},
+						"description": "Get parent's children"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Student Bus Assignment",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/parent/students/1/bus",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"parent",
+								"students",
+								"1",
+								"bus"
+							]
+						},
+						"description": "Get bus assignment for a specific child"
+					},
+					"response": []
+				},
+				{
+					"name": "Track Bus Location",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/parent/buses/1/location",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"parent",
+								"buses",
+								"1",
+								"location"
+							]
+						},
+						"description": "Get real-time bus location"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Bus Route",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/parent/buses/1/route",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"parent",
+								"buses",
+								"1",
+								"route"
+							]
+						},
+						"description": "Get bus route information"
+					},
+					"response": []
+				}
+			],
+			"description": "Parent-specific endpoints"
+		},
+		{
+			"name": "Messages",
+			"item": [
+				{
+					"name": "Send Message",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"subject\": \"Parent-Teacher Meeting\",\n    \"content\": \"Dear parents, we have scheduled a parent-teacher meeting next week.\",\n    \"messageType\": \"BROADCAST\",\n    \"recipientUserIds\": [5, 6, 7],\n    \"priority\": \"NORMAL\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/messages/send",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"messages",
+								"send"
+							]
+						},
+						"description": "Send a direct or broadcast message"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Inbox",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/messages/inbox?page=0&size=20",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"messages",
+								"inbox"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "20"
+								}
+							]
+						},
+						"description": "Get received messages"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Sent Messages",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/messages/sent?page=0&size=20",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"messages",
+								"sent"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "20"
+								}
+							]
+						},
+						"description": "Get sent messages"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Unread Messages",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/messages/unread?page=0&size=20",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"messages",
+								"unread"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "20"
+								}
+							]
+						},
+						"description": "Get unread messages"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Unread Count",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/messages/unread/count",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"messages",
+								"unread",
+								"count"
+							]
+						},
+						"description": "Get count of unread messages"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Message by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/messages/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"messages",
+								"1"
+							]
+						},
+						"description": "Get message details"
+					},
+					"response": []
+				},
+				{
+					"name": "Mark as Read",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/messages/1/mark-read",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"messages",
+								"1",
+								"mark-read"
+							]
+						},
+						"description": "Mark a message as read"
+					},
+					"response": []
+				},
+				{
+					"name": "Reply to Message",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"content\": \"Thank you for the information. I will attend the meeting.\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/messages/1/reply",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"messages",
+								"1",
+								"reply"
+							]
+						},
+						"description": "Reply to a message"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Message Replies",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/messages/1/replies",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"messages",
+								"1",
+								"replies"
+							]
+						},
+						"description": "Get all replies to a message"
+					},
+					"response": []
+				},
+				{
+					"name": "Search Messages",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/messages/search?query=meeting&page=0&size=20",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"messages",
+								"search"
+							],
+							"query": [
+								{
+									"key": "query",
+									"value": "meeting"
+								},
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "20"
+								}
+							]
+						},
+						"description": "Search messages by content"
+					},
+					"response": []
+				}
+			],
+			"description": "Messaging endpoints"
+		},
+		{
+			"name": "Notifications",
+			"item": [
+				{
+					"name": "Send Emergency Notification",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"Emergency Alert\",\n    \"message\": \"School will be closed today due to weather conditions.\",\n    \"notificationType\": \"EMERGENCY\",\n    \"targetAudience\": \"ALL_PARENTS\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/notifications/emergency",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"notifications",
+								"emergency"
+							]
+						},
+						"description": "Send emergency notification to parents"
+					},
+					"response": []
+				},
+				{
+					"name": "Broadcast to Bus Parents",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"Bus Delay\",\n    \"message\": \"Bus will be delayed by 15 minutes due to traffic.\",\n    \"notificationType\": \"BUS_ALERT\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/notifications/bus/1/broadcast",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"notifications",
+								"bus",
+								"1",
+								"broadcast"
+							]
+						},
+						"description": "Send notification to all parents of students on a bus"
+					},
+					"response": []
+				},
+				{
+					"name": "Get My Notifications",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/notifications/my-notifications?page=0&size=20",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"notifications",
+								"my-notifications"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "20"
+								}
+							]
+						},
+						"description": "Get current user's notifications"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Unread Notifications",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/notifications/unread?page=0&size=20",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"notifications",
+								"unread"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "20"
+								}
+							]
+						},
+						"description": "Get current user's unread notifications"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Unread Count",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/notifications/unread/count",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"notifications",
+								"unread",
+								"count"
+							]
+						},
+						"description": "Get count of unread notifications"
+					},
+					"response": []
+				},
+				{
+					"name": "Mark as Read",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/notifications/1/read",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"notifications",
+								"1",
+								"read"
+							]
+						},
+						"description": "Mark a notification as read"
+					},
+					"response": []
+				},
+				{
+					"name": "Acknowledge Notification",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/notifications/1/acknowledge",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"notifications",
+								"1",
+								"acknowledge"
+							]
+						},
+						"description": "Acknowledge an emergency notification"
+					},
+					"response": []
+				}
+			],
+			"description": "Notification management endpoints"
+		},
+		{
+			"name": "Dashboard",
+			"item": [
+				{
+					"name": "Get School Dashboard Stats",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/dashboard/school",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"dashboard",
+								"school"
+							]
+						},
+						"description": "Get dashboard statistics for school admin"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Parent Dashboard Stats",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/dashboard/parent",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"dashboard",
+								"parent"
+							]
+						},
+						"description": "Get dashboard statistics for parent"
+					},
+					"response": []
+				}
+			],
+			"description": "Dashboard statistics endpoints"
+		},
+		{
+			"name": "Device Tokens",
+			"item": [
+				{
+					"name": "Register Device Token",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"token\": \"device-fcm-token-here\",\n    \"deviceType\": \"ANDROID\",\n    \"deviceName\": \"Samsung Galaxy S21\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/devices/register-token",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"devices",
+								"register-token"
+							]
+						},
+						"description": "Register device token for push notifications"
+					},
+					"response": []
+				},
+				{
+					"name": "Remove Device Token",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/devices/token?token=device-fcm-token-here",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"devices",
+								"token"
+							],
+							"query": [
+								{
+									"key": "token",
+									"value": "device-fcm-token-here"
+								}
+							]
+						},
+						"description": "Remove device token"
+					},
+					"response": []
+				}
+			],
+			"description": "Device token management for push notifications"
+		},
+		{
+			"name": "System Admin - Schools",
+			"item": [
+				{
+					"name": "Create School",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Greenwood High School\",\n    \"subdomain\": \"greenwood\",\n    \"address\": \"123 School Street, City, State, 12345\",\n    \"phoneNumber\": \"+1234567890\",\n    \"email\": \"info@greenwood.edu\",\n    \"principalFirstName\": \"John\",\n    \"principalLastName\": \"Doe\",\n    \"principalEmail\": \"principal@greenwood.edu\",\n    \"principalPhone\": \"+1234567891\",\n    \"principalUsername\": \"principal.greenwood\",\n    \"principalPassword\": \"Principal@123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/admin/schools",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"schools"
+							]
+						},
+						"description": "Create a new school with principal account"
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Schools",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/admin/schools?page=0&size=20&status=ACTIVE&search=",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"schools"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "20"
+								},
+								{
+									"key": "status",
+									"value": "ACTIVE",
+									"description": "ACTIVE, INACTIVE, SUSPENDED"
+								},
+								{
+									"key": "search",
+									"value": ""
+								}
+							]
+						},
+						"description": "Get paginated list of all schools"
+					},
+					"response": []
+				},
+				{
+					"name": "Get School by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/admin/schools/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"schools",
+								"1"
+							]
+						},
+						"description": "Get school details by ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Update School",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Greenwood High School\",\n    \"address\": \"123 School Street, City, State, 12345\",\n    \"phoneNumber\": \"+1234567890\",\n    \"email\": \"info@greenwood.edu\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/admin/schools/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"schools",
+								"1"
+							]
+						},
+						"description": "Update school information"
+					},
+					"response": []
+				},
+				{
+					"name": "Update School Status",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": \"ACTIVE\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/admin/schools/1/status",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"schools",
+								"1",
+								"status"
+							]
+						},
+						"description": "Update school status (ACTIVE, SUSPENDED, INACTIVE)"
+					},
+					"response": []
+				}
+			],
+			"description": "School management for system administrators"
+		},
+		{
+			"name": "System Admin Management",
+			"item": [
+				{
+					"name": "Create System Admin",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"sysadmin2\",\n    \"email\": \"sysadmin2@edutrack.com\",\n    \"password\": \"SysAdmin@123\",\n    \"firstName\": \"Jane\",\n    \"lastName\": \"Smith\",\n    \"phoneNumber\": \"+1234567893\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/admin/system-admins",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"system-admins"
+							]
+						},
+						"description": "Create a new system administrator account"
+					},
+					"response": []
+				},
+				{
+					"name": "Get All System Admins",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/admin/system-admins?page=0&size=20&status=ACTIVE&search=",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"system-admins"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "20"
+								},
+								{
+									"key": "status",
+									"value": "ACTIVE",
+									"description": "ACTIVE, INACTIVE, SUSPENDED"
+								},
+								{
+									"key": "search",
+									"value": ""
+								}
+							]
+						},
+						"description": "Get paginated list of all system administrator accounts"
+					},
+					"response": []
+				},
+				{
+					"name": "Get System Admin by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/admin/system-admins/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"system-admins",
+								"1"
+							]
+						},
+						"description": "Get system administrator details by ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Update System Admin Status",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/admin/system-admins/1/status?status=ACTIVE",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"system-admins",
+								"1",
+								"status"
+							],
+							"query": [
+								{
+									"key": "status",
+									"value": "ACTIVE",
+									"description": "ACTIVE, INACTIVE, SUSPENDED"
+								}
+							]
+						},
+						"description": "Activate or deactivate a system administrator account"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete System Admin",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/admin/system-admins/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"system-admins",
+								"1"
+							]
+						},
+						"description": "Delete a system administrator account (soft delete)"
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints for managing system administrator accounts"
+		},
+		{
+			"name": "Public",
+			"item": [
+				{
+					"name": "Get School Branding by Subdomain",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/public/schools/by-subdomain/{{school_subdomain}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"public",
+								"schools",
+								"by-subdomain",
+								"{{school_subdomain}}"
+							]
+						},
+						"description": "Get school branding information for login page (no authentication required)"
+					},
+					"response": []
+				},
+				{
+					"name": "Submit Demo Request",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    var jsonData = pm.response.json();",
+									"    if (jsonData.data && jsonData.data.requestId) {",
+									"        pm.collectionVariables.set('demo_request_id', jsonData.data.requestId);",
+									"        console.log('Saved demo_request_id: ' + jsonData.data.requestId);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"schoolName\": \"Springfield Elementary School\",\n    \"contactName\": \"John Smith\",\n    \"email\": \"john.smith@springfield.edu\",\n    \"phone\": \"+1234567890\",\n    \"schoolSize\": \"500-1000 students\",\n    \"message\": \"We are interested in implementing EduTrack360 for our school. Please schedule a demo at your earliest convenience.\",\n    \"country\": \"United States\",\n    \"preferredDemoDate\": \"2026-03-15\",\n    \"source\": \"website\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/public/demo-requests",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"public",
+								"demo-requests"
+							]
+						},
+						"description": "Submit a demo/sales lead request from the landing page. No authentication required."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Demo Request Status",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/public/demo-requests/{{demo_request_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"public",
+								"demo-requests",
+								"{{demo_request_id}}"
+							]
+						},
+						"description": "Track the status of a submitted demo request using the request ID. No authentication required."
+					},
+					"response": []
+				}
+			],
+			"description": "Public endpoints (no authentication required)"
+		},
+		{
+			"name": "Demo Request Management (Admin)",
+			"item": [
+				{
+					"name": "Get All Demo Requests",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/admin/demo-requests?page=0&size=20",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"demo-requests"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "20"
+								},
+								{
+									"key": "status",
+									"value": "PENDING",
+									"disabled": true
+								},
+								{
+									"key": "assignedTo",
+									"value": "sales-rep",
+									"disabled": true
+								},
+								{
+									"key": "search",
+									"value": "springfield",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Get paginated list of all demo requests with optional filtering by status, assignee, and search term. Requires SYSTEM_ADMIN role."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Demo Request Stats",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/admin/demo-requests/stats",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"demo-requests",
+								"stats"
+							]
+						},
+						"description": "Get statistics about demo requests including counts by status and time periods. Requires SYSTEM_ADMIN role."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Demo Request by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/admin/demo-requests/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"demo-requests",
+								"1"
+							]
+						},
+						"description": "Get full details of a demo request by its database ID. Requires SYSTEM_ADMIN role."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Demo Request by Request ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/admin/demo-requests/by-request-id/{{demo_request_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"demo-requests",
+								"by-request-id",
+								"{{demo_request_id}}"
+							]
+						},
+						"description": "Get full details of a demo request by its public request ID (UUID). Requires SYSTEM_ADMIN role."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Demo Request",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": \"CONTACTED\",\n    \"internalNotes\": \"Initial call made. Customer interested in premium plan.\",\n    \"assignedTo\": \"sales-team\",\n    \"scheduledDemoDate\": \"2026-03-20T10:00:00\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/admin/demo-requests/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"demo-requests",
+								"1"
+							]
+						},
+						"description": "Update demo request status, internal notes, assignee, or scheduled demo date. Requires SYSTEM_ADMIN role."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Demo Request Status",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/admin/demo-requests/1/status?status=SCHEDULED",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"demo-requests",
+								"1",
+								"status"
+							],
+							"query": [
+								{
+									"key": "status",
+									"value": "SCHEDULED"
+								}
+							]
+						},
+						"description": "Quick update of demo request status only. Available statuses: PENDING, CONTACTED, SCHEDULED, COMPLETED, CONVERTED, DECLINED, NO_RESPONSE. Requires SYSTEM_ADMIN role."
+					},
+					"response": []
+				},
+				{
+					"name": "Assign Demo Request",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/admin/demo-requests/1/assign?assignedTo=john-sales",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"demo-requests",
+								"1",
+								"assign"
+							],
+							"query": [
+								{
+									"key": "assignedTo",
+									"value": "john-sales"
+								}
+							]
+						},
+						"description": "Assign a demo request to a team member. Requires SYSTEM_ADMIN role."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Demo Request",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/admin/demo-requests/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"demo-requests",
+								"1"
+							]
+						},
+						"description": "Permanently delete a demo request. Requires SYSTEM_ADMIN role."
+					},
+					"response": []
+				}
+			],
+			"description": "Admin endpoints for managing demo/sales lead requests. Requires SYSTEM_ADMIN role."
+		}
+	]
+}
